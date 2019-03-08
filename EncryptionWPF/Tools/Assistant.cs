@@ -45,14 +45,21 @@ namespace EncryptionWPF.Tools
         }
         public void WriteLog(string input)
         {
-            string content = null;
-            if (File.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs\\SEF.log"))
+            try
             {
-                content = File.ReadAllText("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs\\SEF.log");
+                string content = null;
+                if (File.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs\\SEF.log"))
+                {
+                    content = File.ReadAllText("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs\\SEF.log");
+                }
+                StreamWriter sw = new StreamWriter("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs\\SEF.log");
+                sw.Write(content + input);
+                sw.Close();
             }
-            StreamWriter sw = new StreamWriter("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs\\SEF.log");
-            sw.WriteAsync(content + input);
-            sw.Close();
+            catch
+            {
+                //nothing
+            }
         }
         public void DeleteLog()
         {
