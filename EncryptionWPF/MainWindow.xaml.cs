@@ -16,6 +16,7 @@ using EncryptionWPF.Tools;
 using EncryptionWPF.Encryption;
 using System.IO;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace EncryptionWPF
 {
@@ -24,22 +25,27 @@ namespace EncryptionWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        #region Variablen
         Assistant assistant = new Assistant();
         MyAes aes = new MyAes();
         Random rnd = new Random();
         string log;
-        string iv = "0";
+        string iv = null;
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
-            if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs"))
+            if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs"))
             {
-                Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Logs");
-                log = DateTime.Now + " Log Verzeichnis erstellt\n";
+                Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs");
+                log = "Log Verzeichnis erstellt!";
                 assistant.WriteLog(log);
             }
-            log = DateTime.Now + " Programm gestartet!\n";
+            log = "Programm gestartet!";
             assistant.WriteLog(log);
+            textBoxLastLog.Text = log;
         }
 
         private void buttonEncrypt_Click(object sender, RoutedEventArgs e)
@@ -51,8 +57,9 @@ namespace EncryptionWPF
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                log = DateTime.Now + " Fehler: Passwort leer!\n";
+                log = "Fehler: Passwort leer!";
                 assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
             }
             else if (textBoxIN.Text == null || textBoxIN.Text == "" || textBoxIN.Text == " ")
             {
@@ -61,44 +68,42 @@ namespace EncryptionWPF
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                log = DateTime.Now + " Fehler: Eingabe leer!\n";
+                log = "Fehler: Eingabe leer!";
                 assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
             }
             else
             {
                 try
                 {
-                    if(iv == "0")
+                    if (iv == null)
                     {
-                        List<char> str = new List<char>();
-                        for (int i = 0; i <= 16; i++)
-                        {
-                                char c = (char)rnd.Next(33, 122);
-                                str.Add(c);
-                        }
-                        iv = new string(str.ToArray());
-                        log = DateTime.Now + " IV erstellt\n";
+                        iv = assistant.RandomGen(16);
+                        log = "IV erstellt!";
                         assistant.WriteLog(log);
+                        textBoxLastLog.Text = log;
                     }
                     assistant.SetPW(textBoxPW.Text);
                     assistant.SetIV(iv);
                     aes.SetIVfromPW(assistant.GetIV());
                     aes.Generator(assistant.GetPW());
                     textBoxOUT.Text = aes.Encrypt(textBoxIN.Text);
-                    log = DateTime.Now + " Text verschlüsselt\n";
+                    log = "Text verschlüsselt!";
                     assistant.WriteLog(log);
+                    textBoxLastLog.Text = log;
                 }
-                catch(Exception err)
+                catch (Exception err)
                 {
                     MessageBox.Show(
                         "Kann nicht Verschlüsseln!",
                         "Fehler",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
-                    log = DateTime.Now + " Fehler: Verschlüsseln fehlgeschlagen! " + err.Message + "\n";
+                    log = "Fehler: Verschlüsseln fehlgeschlagen! " + err.Message;
                     assistant.WriteLog(log);
+                    textBoxLastLog.Text = log;
                 }
-                iv = "0";
+                iv = null;
             }
         }
 
@@ -111,18 +116,20 @@ namespace EncryptionWPF
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                log = DateTime.Now + " Fehler: Passwort leer!\n";
+                log = "Fehler: Passwort leer!";
                 assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
             }
-            else if(textBoxIN.Text == null || textBoxIN.Text == "" || textBoxIN.Text == " ")
+            else if (textBoxIN.Text == null || textBoxIN.Text == "" || textBoxIN.Text == " ")
             {
                 MessageBox.Show(
                     "Eingabefeld darf nicht leer sein!",
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                log = DateTime.Now + " Fehler: Eingabe leer!\n";
+                log = "Fehler: Eingabe leer!";
                 assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
             }
             else
             {
@@ -133,18 +140,20 @@ namespace EncryptionWPF
                     aes.SetIVfromPW(assistant.GetIV());
                     aes.Generator(assistant.GetPW());
                     textBoxOUT.Text = aes.Decrypt(textBoxIN.Text);
-                    log = DateTime.Now + " Text entschlüsselt!\n";
+                    log = "Text entschlüsselt!";
                     assistant.WriteLog(log);
+                    textBoxLastLog.Text = log;
                 }
-                catch(Exception err)
+                catch (Exception err)
                 {
                     MessageBox.Show(
                         "Falsches Passwort!",
                         "Fehler",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
-                    log = DateTime.Now + " Fehler: Entschlüsseln fehlgeschlagen! " + err.Message + "\n";
+                    log = "Fehler: Entschlüsseln fehlgeschlagen! " + err.Message;
                     assistant.WriteLog(log);
+                    textBoxLastLog.Text = log;
                 }
             }
         }
@@ -158,42 +167,46 @@ namespace EncryptionWPF
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                log = DateTime.Now + " Fehler: Ausgabe leer!\n";
+                log = "Fehler: Ausgabe leer!";
                 assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
             }
             else
             {
                 try
                 {
-                    if(!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Saves"))
+                    if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves"))
                     {
-                        Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Saves");
-                        log = DateTime.Now + " Saves Ordner erstellt!\n";
+                        Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves");
+                        log = "Saves Ordner erstellt!";
                         assistant.WriteLog(log);
+                        textBoxLastLog.Text = log;
                     }
                     SaveFileDialog saveFileDialog = new SaveFileDialog();
-                    saveFileDialog.Filter = "SimpleEncryptionFile|*.sfd|Alle Dateien|*.*";
-                    saveFileDialog.FileName = "MeinText";
+                    saveFileDialog.Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*";
+                    saveFileDialog.FileName = "Text";
                     saveFileDialog.DefaultExt = ".sfd";
-                    saveFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEFdata\\Saves";
+                    saveFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves";
                     if (saveFileDialog.ShowDialog() == true)
                     {
                         StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
-                        sw.WriteAsync(textBoxOUT.Text + "||" + assistant.GetIV());
+                        sw.Write(textBoxOUT.Text + assistant.GetIV());
                         sw.Close();
-                        log = DateTime.Now + " Datei gespeichert!\n";
+                        log = "Datei gespeichert!";
                         assistant.WriteLog(log);
+                        textBoxLastLog.Text = log;
                     }
                 }
-                catch(Exception err)
+                catch (Exception err)
                 {
                     MessageBox.Show(
                     "Konnte Datei nicht speichern!",
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                    log = DateTime.Now + " Fehler: Speichern fehlgeschlagen! " + err.Message + "\n";
+                    log = "Fehler: Speichern fehlgeschlagen! " + err.Message;
                     assistant.WriteLog(log);
+                    textBoxLastLog.Text = log;
                 }
             }
         }
@@ -204,48 +217,55 @@ namespace EncryptionWPF
             {
                 string content;
                 OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "SimpleEncryptionFile|*.sfd|Alle Dateien|*.*";
+                openFileDialog.Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*";
                 if (openFileDialog.ShowDialog() == true)
                 {
                     content = File.ReadAllText(openFileDialog.FileName);
-                    textBoxIN.Text = content.Substring(0, content.LastIndexOf("||"));
-                    iv = content.Remove(0, content.LastIndexOf("||") + 2);
-                    log = DateTime.Now + " Datei geladen!\n";
+                    textBoxIN.Text = content.Substring(0, content.Length - 16);
+                    iv = content.Substring(content.Length - 16);
+                    log = "Datei geladen!";
                     assistant.WriteLog(log);
+                    textBoxLastLog.Text = log;
                 }
             }
-            catch(Exception err)
+            catch (Exception err)
             {
                 MessageBox.Show(
                     "Konnte Datei nicht lesen!",
                     "Fehler",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                log = DateTime.Now + " Fehler: Laden fehlgeschlagen! " + err.Message + "\n";
+                log = "Fehler: Laden fehlgeschlagen! " + err.Message;
                 assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
             }
         }
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
             textBoxPW.Text = "12345678";
+            iv = null;
             textBoxIN.Clear();
             textBoxOUT.Clear();
-            log = DateTime.Now + " Felder resettet!\n";
+            log = "Felder resettet!";
             assistant.WriteLog(log);
+            textBoxLastLog.Text = log;
         }
 
         private void buttonExit_Click(object sender, RoutedEventArgs e)
         {
-            log = DateTime.Now + " Programm geschlossen!\n";
+            log = "Programm geschlossen!";
             assistant.WriteLog(log);
+            textBoxLastLog.Text = log;
             this.Close();
         }
 
         private void buttonAbout_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "Ein Programm zur Verschlüsselung",
+                "Erstellt von Tobias Nies." + Environment.NewLine
+                + "Dieses Programm nutzt die AES-256 Verschlüsselung, welche auch als Military Standard bekannt ist." + Environment.NewLine
+                + "Version 1.1",
                 "SimpleEncryption",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -253,22 +273,44 @@ namespace EncryptionWPF
 
         private void buttonGen_Click(object sender, RoutedEventArgs e)
         {
-            int i = 0;
-            List<char> str = new List<char>();
-            while (i < 10)
-            {
-                char c = (char)rnd.Next(33, 125);
-                str.Add(c);
-                i++;
-            }
-            textBoxPW.Text = new string(str.ToArray());
-            log = DateTime.Now + " Passwort generiert!\n";
+            textBoxPW.Text = assistant.RandomGen(12);
+            log = "Passwort generiert!";
             assistant.WriteLog(log);
+            textBoxLastLog.Text = log;
         }
 
         private void buttonDelLog_Click(object sender, RoutedEventArgs e)
         {
             assistant.DeleteLog();
+            textBoxLastLog.Text = "Log wurde gelöscht!";
+        }
+
+        private void buttonShowLog_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                log = "Log Datei ausgelesen!";
+                assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
+                if (File.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log"))
+                {
+                    Process.Start(
+                        @"C:\Windows\System32\Notepad.exe",
+                        "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log");
+                }
+
+            }
+            catch (Exception err)
+            {
+                log = "Konnte Log Datei nicht lesen! " + err.Message;
+                assistant.WriteLog(log);
+                textBoxLastLog.Text = log;
+                MessageBox.Show(
+                    "Fehler beim Öffnen der Log Datei!",
+                    "Fehler",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
     }
 }

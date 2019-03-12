@@ -10,8 +10,7 @@
         Height="500" Width="800">
     <Grid Background="#FF323232">
         <Grid.RowDefinitions>
-            <RowDefinition>
-            </RowDefinition>
+            <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
@@ -31,36 +30,39 @@
             Grid.Row="0"
             Content="Passwort:"
             VerticalAlignment="Top" 
-            HorizontalAlignment="Left"
             Margin="10,0,0,0"
             Foreground="White"/>
-        <TextBox x:Name="textBoxPW"
-                 TextWrapping="Wrap"
-                 MaxLength="32"
-                 Text="12345678"
-                 MinWidth="155"
-                 MinHeight="25"
-                 Margin="10, 25, 0, 0"
-                 VerticalAlignment="Top"/>
+        <TextBox
+            Grid.ColumnSpan="2"
+            x:Name="textBoxPW"
+            TextWrapping="Wrap"
+            MaxLength="32"
+            Text="12345678"
+            MinWidth="230"
+            MinHeight="25"
+            Margin="10, 25, 0, 0"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"/>
         <Button
             x:Name="buttonGen"
             Grid.Column="1"
+            Grid.ColumnSpan="2"
             Grid.Row="0"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
             MinHeight="25"
             MinWidth="100"
-            Margin="10, 25, 0, 0"
-            Content="Generieren" Click="buttonGen_Click"/>
+            Margin="90, 25, 0, 0"
+            Content="Generieren"
+            Click="buttonGen_Click"/>
         <Label
             x:Name="labelInput"
             Grid.Column="0"
             Grid.Row="1"
             Content="Eingabe:"
-            VerticalAlignment="Top"
-            HorizontalAlignment="Left"
-            Foreground="White"
-            Margin="10, 0, 0, 0"/>
+            VerticalAlignment="Top" 
+            Margin="10,0,0,0"
+            Foreground="White"/>
         <TextBox
             x:Name="textBoxIN"
             Grid.Column="0"
@@ -71,7 +73,7 @@
             MinWidth="300"
             MinHeight="200"
             Text=""
-            Margin="10, 25, 10, 0"
+            Margin="10, 25, 0, 0"
             AcceptsReturn="True"/>
         <Label
             x:Name="labelOUT"
@@ -79,10 +81,8 @@
             Grid.Row="1"
             Content="Ausgabe:"
             VerticalAlignment="Top" 
-            HorizontalAlignment="Left"
-            Margin="10,0,0,0"
             Foreground="White"
-            />
+            Margin="10,0,0,0"/>
         <TextBox
             x:Name="textBoxOUT"
             Grid.Column="2"
@@ -93,14 +93,14 @@
             MinWidth="300"
             MinHeight="200"
             IsReadOnly="True"
-            Margin="10, 25, 10, 0"/>
+            Margin="10, 25, 0, 0"/>
         <Button
             x:Name="buttonEncrypt"
             Grid.Column="4"
             Grid.Row="2"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
             Margin="10, 10, 0, 0"
             Content="Verschlüsseln"
@@ -111,7 +111,7 @@
             Grid.Row="2"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
             Margin="10, 45, 0, 0"
             Content="Entschlüsseln"
@@ -122,7 +122,7 @@
             Grid.Row="4"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
             Margin="10, 10, 0, 0"
             Content="Speichern"
@@ -131,7 +131,7 @@
             x:Name="buttonLoad"
             Grid.Column="1"
             Grid.Row="4"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
             Margin="10, 10, 0, 0"
             Content="Laden"
@@ -144,7 +144,7 @@
             Grid.Row="4"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
             Margin="10, 10, 0, 0"
             Content="Reset"
@@ -155,7 +155,7 @@
             Grid.Row="5"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
             Margin="10, 10, 0, 0"
             Content="Über"
@@ -166,9 +166,9 @@
             Grid.Row="5"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
-            Margin="10, 35, 0, 0"
+            Margin="10, 40, 0, 0"
             Content="Schließen"
             Click="buttonExit_Click"/>
         <Button
@@ -177,9 +177,50 @@
             Grid.Row="5"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
-            MinHeight="20"
+            MinHeight="25"
             MinWidth="100"
-            Margin="10, 35, 0, 0"
-            Content="Log löschen" Click="buttonDelLog_Click"/>
+            Margin="20, 40, 0, 0"
+            Content="Log löschen"
+            Click="buttonDelLog_Click"/>
+        <Button
+            x:Name="buttonShowLog"
+            Grid.Column="3"
+            Grid.Row="5"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            MinHeight="25"
+            MinWidth="100"
+            Margin="20, 10, 0, 0"
+            Content="Zeige Log"
+            Click="buttonShowLog_Click"/>
+        <Label
+            x:Name="labelLastLog"
+            Grid.Column="0"
+            Grid.Row="5"
+            Content="Letzter Log Eintrag:"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Foreground="White"
+            Margin="40,20,0,0"/>
+        <TextBox
+            x:Name="textBoxLastLog"
+            Grid.Column="1"
+            Grid.Row="5"
+            Grid.ColumnSpan="2"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            MinWidth="250"
+            MaxHeight="25"
+            IsReadOnly="True"
+            Margin="0,23,0,0"/>
+        <Label
+            x:Name="labelVersion"
+            Foreground="White"
+            Grid.Column="4"
+            Grid.Row="0"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Right"
+            Content="Version 1.1"
+            FontSize="12"/>
     </Grid>
 </Window>

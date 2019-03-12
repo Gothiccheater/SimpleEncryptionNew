@@ -9,8 +9,12 @@ namespace EncryptionWPF.Encryption
 {
     class MyAes
     {
+
+        #region Variablen
         public string IV_Setup;
         AesCryptoServiceProvider crypto;
+        #endregion
+
         public MyAes()
         {
             crypto = new AesCryptoServiceProvider();
@@ -22,7 +26,7 @@ namespace EncryptionWPF.Encryption
         {
             ICryptoTransform transform = crypto.CreateEncryptor();
             byte[] encrypted_bytes = transform.TransformFinalBlock(
-                UTF8Encoding.UTF8.GetBytes(clear_text),
+                Encoding.Default.GetBytes(clear_text),
                 0,
                 clear_text.Length);
             string str = Convert.ToBase64String(encrypted_bytes);
@@ -33,15 +37,15 @@ namespace EncryptionWPF.Encryption
             ICryptoTransform transform = crypto.CreateDecryptor();
             byte[] enc_bytes = Convert.FromBase64String(cipher_text);
             byte[] decrypted_bytes = transform.TransformFinalBlock(enc_bytes, 0, enc_bytes.Length);
-            string str = UTF8Encoding.UTF8.GetString(decrypted_bytes);
+            string str = Encoding.Default.GetString(decrypted_bytes);
             return str;
         }
         public String Generator(String key)
         {
-            byte[] Key_bytes = UTF8Encoding.UTF8.GetBytes(key);
+            byte[] Key_bytes = Encoding.Default.GetBytes(key);
             crypto.Key = Key_bytes;
             string IV_Str = GetIV();
-            byte[] IV = UTF8Encoding.UTF8.GetBytes(IV_Str);
+            byte[] IV = Encoding.Default.GetBytes(IV_Str);
             crypto.IV = IV;
             string str = key;
             return str;
