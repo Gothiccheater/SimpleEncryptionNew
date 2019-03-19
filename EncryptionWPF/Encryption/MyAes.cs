@@ -11,7 +11,7 @@ namespace EncryptionWPF.Encryption
     {
 
         #region Variablen
-        public string IV_Setup;
+        private string IV_str;
         AesCryptoServiceProvider crypto;
         #endregion
 
@@ -36,7 +36,10 @@ namespace EncryptionWPF.Encryption
         {
             ICryptoTransform transform = crypto.CreateDecryptor();
             byte[] enc_bytes = Convert.FromBase64String(cipher_text);
-            byte[] decrypted_bytes = transform.TransformFinalBlock(enc_bytes, 0, enc_bytes.Length);
+            byte[] decrypted_bytes = transform.TransformFinalBlock(
+                enc_bytes,
+                0,
+                enc_bytes.Length);
             string str = Encoding.Default.GetString(decrypted_bytes);
             return str;
         }
@@ -44,19 +47,18 @@ namespace EncryptionWPF.Encryption
         {
             byte[] Key_bytes = Encoding.Default.GetBytes(key);
             crypto.Key = Key_bytes;
-            string IV_Str = GetIV();
-            byte[] IV = Encoding.Default.GetBytes(IV_Str);
+            byte[] IV = Encoding.Default.GetBytes(IV_str);
             crypto.IV = IV;
             string str = key;
             return str;
         }
-        public void SetIVfromPW(string pw)
+        public void SetIV(string pw)
         {
-            IV_Setup = pw;
+            IV_str = pw;
         }
         public string GetIV()
         {
-            return IV_Setup;
+            return IV_str;
         }
     }
 }

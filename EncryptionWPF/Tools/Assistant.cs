@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Microsoft.Win32;
+using System.Windows.Threading;
 
 namespace EncryptionWPF.Tools
 {
@@ -13,6 +14,7 @@ namespace EncryptionWPF.Tools
 
         #region Variablen
         private string iv, password;
+        private readonly string logPath = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log";
         #endregion
 
         public void SetIV(string input)
@@ -51,8 +53,8 @@ namespace EncryptionWPF.Tools
         {
             try
             {
-                StreamWriter sw = File.AppendText("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log");
-                sw.Write(DateTime.Now + " " + input + Environment.NewLine);
+                StreamWriter sw = File.AppendText(logPath);
+                sw.Write("[" + DateTime.Now + "] " + input + Environment.NewLine);
                 sw.Close();
             }
             catch
@@ -64,9 +66,9 @@ namespace EncryptionWPF.Tools
         {
             try
             {
-                if (File.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log"))
+                if (File.Exists(logPath))
                 {
-                    File.Delete("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log");
+                    File.Delete(logPath);
                 }
             }
             catch (Exception err)
@@ -84,6 +86,10 @@ namespace EncryptionWPF.Tools
                 str.Add(c);
             }
             return new string(str.ToArray());
+        }
+        public string GetLogPath()
+        {
+            return logPath;
         }
     }
 }
