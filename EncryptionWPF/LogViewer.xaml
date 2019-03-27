@@ -45,8 +45,9 @@
             Margin="10,25,0,0"
             IsReadOnly="True"
             HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Auto"/>
+            VerticalScrollBarVisibility="Auto" TextChanged="TextBoxLog_TextChanged"/>
         <Button
+            TabIndex="5"
             x:Name="ButtonClose"
             Grid.Column="4"
             Grid.Row="5"
@@ -58,6 +59,7 @@
             Content="Schließen" 
             Click="ButtonClose_Click"/>
         <Button
+            TabIndex="4"
             x:Name="ButtonLoad"
             Grid.Column="3"
             Grid.Row="5"
@@ -69,17 +71,7 @@
             Content="Lade aktuelle Log" 
             Click="ButtonLoad_Click"/>
         <Button
-            x:Name="ButtonExport"
-            Grid.Column="4"
-            Grid.Row="4"
-            VerticalAlignment="Top"
-            HorizontalAlignment="Left"
-            Content="Exportiere Log"
-            MinWidth="100"
-            MinHeight="25"
-            Margin="10,40,0,0" 
-            Click="ButtonExport_Click"/>
-        <Button
+            TabIndex="2"
             x:Name="ButtonDelete"
             Grid.Column="4"
             Grid.Row="4"
@@ -90,7 +82,20 @@
             MinHeight="25"
             Margin="10,10,0,0"
             Click="ButtonDelete_Click"/>
+        <Button
+            TabIndex="1"
+            x:Name="ButtonExport"
+            Grid.Column="4"
+            Grid.Row="4"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            Content="Exportiere Log"
+            MinWidth="100"
+            MinHeight="25"
+            Margin="10,40,0,0" 
+            Click="ButtonExport_Click"/>
         <CheckBox
+            TabIndex="3"
             x:Name="CheckLoadLog"
             Grid.Column="4"
             Grid.Row="5"

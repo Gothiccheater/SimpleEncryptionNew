@@ -32,6 +32,7 @@ namespace EncryptionWPF
             {
                 TextBoxLog.Text = File.ReadAllText(assistant.GetLogPath());
             }
+            assistant.WriteLog("LogViewer ist offen");
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
@@ -51,27 +52,40 @@ namespace EncryptionWPF
 
         private void ButtonExport_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Log-Datei|*.log|Textdatei|*.txt|Alle Dateien|*.*";
-            saveFileDialog.FileName = "SEF";
-            saveFileDialog.DefaultExt = ".log";
-            if (saveFileDialog.ShowDialog() == true)
+            try
             {
-                StreamWriter sw = File.AppendText(saveFileDialog.FileName);
-                sw.Write("Export vom: " + DateTime.Now + Environment.NewLine + "User: " + Environment.UserName + Environment.NewLine + Environment.NewLine + TextBoxLog.Text);
-                sw.Close();
-                assistant.WriteLog("Log exportiert");
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "Log-Datei|*.log|Textdatei|*.txt|Alle Dateien|*.*";
+                saveFileDialog.FileName = "SEF";
+                saveFileDialog.DefaultExt = ".log";
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
+                    sw.Write("Export vom: " + DateTime.Now + Environment.NewLine + "User: " + Environment.UserName + Environment.NewLine + Environment.NewLine + TextBoxLog.Text);
+                    sw.Close();
+                    assistant.WriteLog("Log exportiert");
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(
+                    "Log konnte nicht exportiert werden!",
+                    "Fehler",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                assistant.WriteLog("Fehler beim Exportieren: " + err.Message);
             }
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             assistant.DeleteLog();
-            TextBoxLog.Clear();
         }
 
         private async void CheckLoadLog_Checked(object sender, RoutedEventArgs e)
         {
+            assistant.WriteLog("Log wird automatisch ausgelesen!");
+            TextBoxLog.ScrollToEnd();
             while (CheckLoadLog.IsChecked == true)
             {
                 if (File.Exists(assistant.GetLogPath()))
@@ -82,8 +96,13 @@ namespace EncryptionWPF
                 {
                     TextBoxLog.Text = "Keine Log-Datei gefunden...";
                 }
-                await Task.Delay(TimeSpan.FromSeconds(0.5));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
+        }
+
+        private void TextBoxLog_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxLog.ScrollToEnd();
         }
     }
 }

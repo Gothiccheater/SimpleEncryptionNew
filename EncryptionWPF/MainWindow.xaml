@@ -35,6 +35,7 @@
             Margin="10,0,0,0"
             Foreground="White"/>
         <TextBox
+            TabIndex="1"
             Grid.ColumnSpan="2"
             x:Name="textBoxPW"
             TextWrapping="Wrap"
@@ -46,6 +47,7 @@
             VerticalAlignment="Top"
             HorizontalAlignment="Left"/>
         <Button
+            TabIndex="2"
             x:Name="buttonGen"
             Grid.Column="0"
             Grid.ColumnSpan="3"
@@ -57,6 +59,20 @@
             Margin="250,25,0,0"
             Content="Generieren"
             Click="ButtonGen_Click"/>
+        <Button
+            x:Name="ButtonLoadIVPW"
+            Visibility="Hidden"
+            IsEnabled="False"
+            TabIndex="15"
+            Grid.Column="2"
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="Zeige Debug-Infos"
+            MinHeight="25"
+            MinWidth="100"
+            Margin="40,25" Click="ButtonLoadIVPW_Click"/>
         <Label
             x:Name="labelInput"
             Grid.Column="0"
@@ -66,6 +82,7 @@
             Margin="10,0,0,0"
             Foreground="White"/>
         <TextBox
+            TabIndex="3"
             x:Name="textBoxIN"
             Grid.Column="0"
             Grid.Row="1"
@@ -101,6 +118,7 @@
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto"/>
         <Button
+            TabIndex="4"
             x:Name="buttonEncrypt"
             Grid.Column="4"
             Grid.Row="2"
@@ -112,6 +130,7 @@
             Content="Verschlüsseln"
             Click="ButtonEncrypt_Click"/>
         <Button
+            TabIndex="8"
             x:Name="buttonDecrypt"
             Grid.Column="4"
             Grid.Row="2"
@@ -122,7 +141,19 @@
             Margin="10,45,0,0"
             Content="Entschlüsseln"
             Click="ButtonDecrypt_Click"/>
+        <CheckBox
+            TabIndex="9"
+            x:Name="CheckBoxAddIV"
+            Grid.Column="4"
+            Grid.Row="3"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="IV mitliefern"
+            Foreground="White"
+            Margin="10,0,0,0" 
+            Checked="CheckBoxAddIV_Checked"/>
         <Button
+            TabIndex="5"
             x:Name="buttonSave"
             Grid.Column="0"
             Grid.Row="4"
@@ -134,6 +165,7 @@
             Content="Speichern"
             Click="ButtonSave_Click"/>
         <Button
+            TabIndex="6"
             x:Name="buttonLoad"
             Grid.Column="1"
             Grid.Row="4"
@@ -145,6 +177,7 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Top"/>
         <Button
+            TabIndex="7"
             x:Name="buttonLoadOther"
             Grid.Column="1"
             Grid.Row="4"
@@ -154,8 +187,9 @@
             Content="Textdatei laden"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Click="buttonLoadOther_Click"/>
+            Click="ButtonLoadOther_Click"/>
         <Button
+            TabIndex="10"
             x:Name="buttonReset"
             Grid.Column="3"
             Grid.Row="4"
@@ -167,6 +201,7 @@
             Content="Reset"
             Click="ButtonReset_Click"/>
         <Button
+            TabIndex="13"
             x:Name="buttonAbout"
             Grid.Column="4"
             Grid.Row="5"
@@ -177,7 +212,7 @@
             Margin="10,10,0,0"
             Content="Über"
             Click="ButtonAbout_Click"/>
-        <Button
+        <Button TabIndex="14"
             x:Name="buttonExit"
             Grid.Column="4"
             Grid.Row="5"
@@ -189,6 +224,7 @@
             Content="Schließen"
             Click="ButtonExit_Click"/>
         <Button
+            TabIndex="11"
             x:Name="buttonShowLog"
             Grid.Column="3"
             Grid.Row="5"
@@ -225,9 +261,10 @@
             Grid.Row="0"
             VerticalAlignment="Top"
             HorizontalAlignment="Right"
-            Content="Version 1.1.1"
+            Content="Version 1.2"
             FontSize="12"/>
         <CheckBox
+            TabIndex="12"
             x:Name="CheckBoxDelLog"
             Grid.Column="4"
             Grid.Row="4"
@@ -235,6 +272,6 @@
             Foreground="White"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Margin="20,60,0,0"/>
+            Margin="20,60,0,0" Checked="CheckBoxDelLog_Checked"/>
     </Grid>
 </Window>

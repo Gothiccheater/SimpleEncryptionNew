@@ -35,17 +35,15 @@ namespace EncryptionWPF
         public MainWindow()
         {
             InitializeComponent();
-            if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs"))
-            {
-                Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs");
-                assistant.WriteLog("Log Verzeichnis erstellt!");
-            }
+            assistant.CreateDirectories();
             assistant.WriteLog("Programm gestartet!");
             UpdateLogText();
+            IsUserOwner();
         }
 
         private void ButtonEncrypt_Click(object sender, RoutedEventArgs e)
         {
+            iv = null;
             if (string.IsNullOrWhiteSpace(textBoxPW.Text))
             {
                 MessageBox.Show(
@@ -73,11 +71,16 @@ namespace EncryptionWPF
                         iv = assistant.RandomGen(16);
                         assistant.WriteLog("IV erstellt!");
                     }
-                    assistant.SetPW(textBoxPW.Text);
+                    assistant.CreateSalt();
                     assistant.SetIV(iv);
+                    assistant.SetPW(textBoxPW.Text);
                     aes.SetIV(assistant.GetIV());
                     aes.Generator(assistant.GetPW());
                     textBoxOUT.Text = aes.Encrypt(textBoxIN.Text);
+                    if (CheckBoxAddIV.IsChecked == true)
+                    {
+                        textBoxOUT.Text += assistant.GetIV();
+                    }
                     assistant.WriteLog("Text verschlüsselt!");
                 }
                 catch (Exception err)
@@ -89,7 +92,6 @@ namespace EncryptionWPF
                         MessageBoxImage.Error);
                     assistant.WriteLog("Fehler: Verschlüsseln fehlgeschlagen! " + err.Message);
                 }
-                iv = null;
             }
         }
 
@@ -117,8 +119,8 @@ namespace EncryptionWPF
             {
                 try
                 {
-                    assistant.SetPW(textBoxPW.Text);
                     assistant.SetIV(iv);
+                    assistant.SetPW(textBoxPW.Text);
                     aes.SetIV(assistant.GetIV());
                     aes.Generator(assistant.GetPW());
                     textBoxOUT.Text = aes.Decrypt(textBoxIN.Text);
@@ -151,20 +153,15 @@ namespace EncryptionWPF
             {
                 try
                 {
-                    if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves"))
-                    {
-                        Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves");
-                        assistant.WriteLog("Saves Ordner erstellt!");
-                    }
                     SaveFileDialog saveFileDialog = new SaveFileDialog();
                     saveFileDialog.Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*";
                     saveFileDialog.FileName = "Text";
                     saveFileDialog.DefaultExt = ".sfd";
-                    saveFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves";
+                    saveFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\UserData";
                     if (saveFileDialog.ShowDialog() == true)
                     {
                         StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
-                        sw.Write(textBoxOUT.Text + assistant.GetIV());
+                        sw.Write(textBoxOUT.Text + Environment.NewLine + "IV: " + assistant.GetIV() + Environment.NewLine + "Salt: " + assistant.GetSalt());
                         sw.Close();
                         assistant.WriteLog("Datei gespeichert!");
                     }
@@ -188,12 +185,18 @@ namespace EncryptionWPF
                 string content;
                 OpenFileDialog openFileDialog = new OpenFileDialog();
                 openFileDialog.Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*";
+                openFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\UserData";
                 if (openFileDialog.ShowDialog() == true)
                 {
                     content = File.ReadAllText(openFileDialog.FileName);
-                    textBoxIN.Text = content.Substring(0, content.Length - 16);
-                    iv = content.Substring(content.Length - 16);
+                    textBoxIN.Text = content.Substring(0, content.LastIndexOf("IV: "));
+                    iv = content.Substring(content.LastIndexOf("IV: ") + 4, 16);
+                    assistant.SetSalt(content.Substring(content.LastIndexOf("Salt: ") + 6));
                     assistant.WriteLog("Datei geladen!");
+                    if (CheckBoxAddIV.IsChecked == true)
+                    {
+                        textBoxIN.Text += iv;
+                    }
                 }
             }
             catch (Exception err)
@@ -211,8 +214,10 @@ namespace EncryptionWPF
         {
             textBoxPW.Text = "12345678";
             iv = null;
+            logViewer = null;
             textBoxIN.Clear();
             textBoxOUT.Clear();
+            assistant.ResetValues();
             assistant.WriteLog("Felder resettet!");
         }
 
@@ -239,8 +244,8 @@ namespace EncryptionWPF
             assistant.WriteLog("Informationen über das Programm eingesehen");
             MessageBox.Show(
                 "Erstellt von Tobias Nies." + Environment.NewLine
-                + "Dieses Programm nutzt die AES-256 Verschlüsselung, welche auch als Military Standard bekannt ist." + Environment.NewLine
-                + "Version 1.1",
+                + "Dieses Programm nutzt die AES-256 Verschlüsselung." + Environment.NewLine
+                + "Version 1.2",
                 "SimpleEncryption",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -271,13 +276,14 @@ namespace EncryptionWPF
             }
         }
 
-        private void buttonLoadOther_Click(object sender, RoutedEventArgs e)
+        private void ButtonLoadOther_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 string content;
                 OpenFileDialog openFileDialog = new OpenFileDialog();
                 openFileDialog.Filter = "Textdatei|*.txt|Alle Dateien|*.*";
+                openFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\";
                 if (openFileDialog.ShowDialog() == true)
                 {
                     content = File.ReadAllText(openFileDialog.FileName);
@@ -307,8 +313,66 @@ namespace EncryptionWPF
                 {
                     textBoxLastLog.Text = "Keine Log-Datei gefunden...";
                 }
-                await Task.Delay(TimeSpan.FromSeconds(0.5));
+                await Task.Delay(TimeSpan.FromMilliseconds(200));
             }
+        }
+
+        private void CheckBoxAddIV_Checked(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult boxResult = MessageBox.Show(
+                 "Diese Funktion sollte nur benutzt werden," +
+                 " wenn ein Text mehrfach verschlüsselt werden soll" +
+                 " und ist aktuell noch experimentell." + Environment.NewLine + "Trotzdem aktivieren?",
+                 "Achtung!",
+                 MessageBoxButton.YesNo,
+                 MessageBoxImage.Warning);
+            if (boxResult == MessageBoxResult.Yes)
+            {
+                CheckBoxAddIV.IsChecked = true;
+            }
+            else
+            {
+                CheckBoxAddIV.IsChecked = false;
+            }
+        }
+        private async void IsUserOwner()
+        {
+            while (true)
+            {
+                if (textBoxIN.Text == "Debug")
+                {
+                    ButtonLoadIVPW.IsEnabled = true;
+                    ButtonLoadIVPW.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    ButtonLoadIVPW.IsEnabled = false;
+                    ButtonLoadIVPW.Visibility = Visibility.Hidden;
+                }
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+            }
+        }
+
+        private void ButtonLoadIVPW_Click(object sender, RoutedEventArgs e)
+        {
+            assistant.WriteLog("Debuginformationen ausgelesen von User: " + Environment.UserName);
+            MessageBox.Show(
+                "IV: " + assistant.GetIV() + Environment.NewLine
+                + "Passwort: " + assistant.GetPW() + Environment.NewLine
+                + "Salt: " + assistant.GetSalt(),
+                "Debuginfos",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void CheckBoxDelLog_Checked(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "Log wird beim Beenden des Programms gelöscht!" + Environment.NewLine
+                + "Eventuelle Fehler können dann nicht mehr nachvollzogen werden!",
+                "Achtung!",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
         }
     }
 }
