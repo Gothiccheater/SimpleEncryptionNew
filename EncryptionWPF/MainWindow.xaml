@@ -251,7 +251,7 @@
             Grid.ColumnSpan="3"
             VerticalAlignment="Top"
             MinWidth="250"
-            MaxHeight="25"
+            MinHeight="25"
             IsReadOnly="True"
             Margin="160,25,0,0"/>
         <Label

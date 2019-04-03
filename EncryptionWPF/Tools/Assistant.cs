@@ -123,7 +123,7 @@ namespace EncryptionWPF.Tools
         }
         public void CreateSalt()
         {
-            salt = RandomGen(rnd.Next(100, 1000));
+            salt = RandomGen(rnd.Next(100, 2000));
         }
         public string GetSalt()
         {
