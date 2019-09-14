@@ -15,15 +15,17 @@ namespace EncryptionWPF.Tools
 
         #region Variablen
         private string iv, password, salt;
-        private readonly string logPath = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log";
-        SHA1 sha1 = SHA1.Create();
+        private readonly string logPath = "C:\\Users\\" + Environment.UserName + "\\Documents\\SimpleEncryption\\Logs\\SimpleEncryption.log";
+        private readonly string userDataDir = "C:\\Users\\" + Environment.UserName + "\\Documents\\SimpleEncryption\\UserData";
+        private readonly string logDataDir = "C:\\Users\\" + Environment.UserName + "\\Documents\\SimpleEncryption\\Logs";
+        SHA256 sha256 = SHA256.Create();
         Random rnd = new Random();
         #endregion
 
         public void SetIV(string input)
         {
             iv = input;
-            while (iv.Length < 16)
+            while(iv.Length < 16)
             {
                 iv += iv;
             }
@@ -42,11 +44,11 @@ namespace EncryptionWPF.Tools
             while (password.Length < 32)
             {
                 byte[] pwbytes = Encoding.Default.GetBytes(text + GetSalt());
-                byte[] sha = sha1.ComputeHash(pwbytes);
+                byte[] sha = sha256.ComputeHash(pwbytes);
                 string hash = Encoding.Default.GetString(sha);
                 password += hash;
             }
-            while (password.Length > 32)
+            while(password.Length > 32)
             {
                 password = password.Remove(32, 1);
             }
@@ -65,7 +67,7 @@ namespace EncryptionWPF.Tools
             }
             catch
             {
-                //nothing
+                //do nothing
             }
         }
         public void DeleteLog()
@@ -100,30 +102,31 @@ namespace EncryptionWPF.Tools
         {
             iv = null;
             password = null;
+            salt = null;
         }
         public void CreateDirectories()
         {
             try
             {
-                if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs"))
+                if (!Directory.Exists(logDataDir))
                 {
-                    Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs");
+                    Directory.CreateDirectory(logDataDir);
                     WriteLog("Log Verzeichnis erstellt!");
                 }
-                if (!Directory.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Saves"))
+                if (!Directory.Exists(userDataDir))
                 {
-                    Directory.CreateDirectory("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\UserData");
+                    Directory.CreateDirectory(userDataDir);
                     WriteLog("UserData Verzeichnis erstellt!");
                 }
             }
             catch
             {
-                //Nothing
+                //Do nothing
             }
         }
         public void CreateSalt()
         {
-            salt = RandomGen(rnd.Next(100, 2000));
+            salt = RandomGen(rnd.Next(300, 2500));
         }
         public string GetSalt()
         {

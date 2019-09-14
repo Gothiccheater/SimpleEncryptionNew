@@ -11,16 +11,17 @@ namespace EncryptionWPF.Encryption
     {
 
         #region Variablen
-        private string IV_str;
         AesCryptoServiceProvider crypto;
         #endregion
 
         public MyAes()
         {
-            crypto = new AesCryptoServiceProvider();
-            crypto.KeySize = 256;
-            crypto.Mode = CipherMode.CBC;
-            crypto.Padding = PaddingMode.PKCS7;
+            crypto = new AesCryptoServiceProvider
+            {
+                KeySize = 256,
+                Mode = CipherMode.CBC,
+                Padding = PaddingMode.PKCS7
+            };
         }
         public String Encrypt(String clear_text)
         {
@@ -43,22 +44,12 @@ namespace EncryptionWPF.Encryption
             string str = Encoding.Default.GetString(decrypted_bytes);
             return str;
         }
-        public String Generator(String key)
+        public void SetParams(String key, String iv_str)
         {
             byte[] Key_bytes = Encoding.Default.GetBytes(key);
             crypto.Key = Key_bytes;
-            byte[] IV = Encoding.Default.GetBytes(IV_str);
+            byte[] IV = Encoding.Default.GetBytes(iv_str);
             crypto.IV = IV;
-            string str = key;
-            return str;
-        }
-        public void SetIV(string pw)
-        {
-            IV_str = pw;
-        }
-        public string GetIV()
-        {
-            return IV_str;
         }
     }
 }

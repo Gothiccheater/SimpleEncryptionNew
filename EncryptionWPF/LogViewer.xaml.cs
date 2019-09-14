@@ -37,7 +37,6 @@ namespace EncryptionWPF
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            assistant.WriteLog("LogViewer geschlossen");
             this.Close();
         }
 
@@ -54,10 +53,12 @@ namespace EncryptionWPF
         {
             try
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "Log-Datei|*.log|Textdatei|*.txt|Alle Dateien|*.*";
-                saveFileDialog.FileName = "SEF";
-                saveFileDialog.DefaultExt = ".log";
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "Log-Datei|*.log|Textdatei|*.txt|Alle Dateien|*.*",
+                    FileName = "SEF",
+                    DefaultExt = ".log"
+                };
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
@@ -66,7 +67,7 @@ namespace EncryptionWPF
                     assistant.WriteLog("Log exportiert");
                 }
             }
-            catch (Exception err)
+            catch(Exception err)
             {
                 MessageBox.Show(
                     "Log konnte nicht exportiert werden!",
@@ -103,6 +104,19 @@ namespace EncryptionWPF
         private void TextBoxLog_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBoxLog.ScrollToEnd();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            assistant.WriteLog("User: " + Environment.UserName);
+            assistant.WriteLog("OS: " + Environment.OSVersion);
+            assistant.WriteLog("64-Bit OS: " + Environment.Is64BitOperatingSystem);
+            assistant.WriteLog("64-Bit Prozess: " + Environment.Is64BitProcess);
+        }
+
+        private void LogViewerWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            assistant.WriteLog("LogViewer geschlossen");
         }
     }
 }

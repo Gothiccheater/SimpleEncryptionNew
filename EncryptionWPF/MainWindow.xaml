@@ -9,7 +9,8 @@
         MinHeight="500" MinWidth="800"
         Height="500" Width="800"
         x:Name="SimpleEncryption"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Closing="SimpleEncryption_Closing">
     <Grid Background="#FF323232">
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -72,7 +73,8 @@
             Content="Zeige Debug-Infos"
             MinHeight="25"
             MinWidth="100"
-            Margin="40,25" Click="ButtonLoadIVPW_Click"/>
+            Margin="40,25"
+            Click="ButtonLoadIVPW_Click"/>
         <Label
             x:Name="labelInput"
             Grid.Column="0"
@@ -148,10 +150,21 @@
             Grid.Row="3"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Content="IV mitliefern"
+            Content="IV und Salt mitliefern"
             Foreground="White"
             Margin="10,0,0,0" 
             Checked="CheckBoxAddIV_Checked"/>
+        <CheckBox
+            TabIndex="9"
+            x:Name="CheckBoxBruteForce"
+            Grid.Row="3"
+            Grid.Column="4"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Content="BruteForce"
+            Foreground="White"
+            Margin="10,0,0,0" Checked="CheckBoxBruteForce_Checked"
+            />
         <Button
             TabIndex="5"
             x:Name="buttonSave"
@@ -243,7 +256,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="White"
-            Margin="45,20,0,0"/>
+            Margin="45,25,0,0"/>
         <TextBox
             x:Name="textBoxLastLog"
             Grid.Column="0"
@@ -272,6 +285,7 @@
             Foreground="White"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Margin="20,60,0,0" Checked="CheckBoxDelLog_Checked"/>
+            Margin="20,60,0,0"
+            Checked="CheckBoxDelLog_Checked"/>
     </Grid>
 </Window>

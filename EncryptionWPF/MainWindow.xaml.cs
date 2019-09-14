@@ -38,7 +38,8 @@ namespace EncryptionWPF
             assistant.CreateDirectories();
             assistant.WriteLog("Programm gestartet!");
             UpdateLogText();
-            IsUserOwner();
+            AllowDebugAccess();
+            textBoxPW.Text = assistant.RandomGen(12);
         }
 
         private void ButtonEncrypt_Click(object sender, RoutedEventArgs e)
@@ -66,7 +67,7 @@ namespace EncryptionWPF
             {
                 try
                 {
-                    if (iv == null)
+                    if(iv == null)
                     {
                         iv = assistant.RandomGen(16);
                         assistant.WriteLog("IV erstellt!");
@@ -74,16 +75,15 @@ namespace EncryptionWPF
                     assistant.CreateSalt();
                     assistant.SetIV(iv);
                     assistant.SetPW(textBoxPW.Text);
-                    aes.SetIV(assistant.GetIV());
-                    aes.Generator(assistant.GetPW());
+                    aes.SetParams(assistant.GetPW(), assistant.GetIV());
                     textBoxOUT.Text = aes.Encrypt(textBoxIN.Text);
-                    if (CheckBoxAddIV.IsChecked == true)
+                    if(CheckBoxAddIV.IsChecked == true)
                     {
-                        textBoxOUT.Text += assistant.GetIV();
+                        textBoxOUT.Text += " :::/ " + assistant.GetIV() + " ::::: " + assistant.GetSalt();
                     }
                     assistant.WriteLog("Text verschlüsselt!");
                 }
-                catch (Exception err)
+                catch(Exception err)
                 {
                     MessageBox.Show(
                         "Kann nicht Verschlüsseln!",
@@ -106,7 +106,7 @@ namespace EncryptionWPF
                     MessageBoxImage.Error);
                 assistant.WriteLog("Fehler: Passwort leer!");
             }
-            else if (string.IsNullOrWhiteSpace(textBoxIN.Text))
+            else if(string.IsNullOrWhiteSpace(textBoxIN.Text))
             {
                 MessageBox.Show(
                     "Eingabefeld darf nicht leer sein!",
@@ -121,12 +121,11 @@ namespace EncryptionWPF
                 {
                     assistant.SetIV(iv);
                     assistant.SetPW(textBoxPW.Text);
-                    aes.SetIV(assistant.GetIV());
-                    aes.Generator(assistant.GetPW());
+                    aes.SetParams(assistant.GetPW(), assistant.GetIV());
                     textBoxOUT.Text = aes.Decrypt(textBoxIN.Text);
                     assistant.WriteLog("Text entschlüsselt!");
                 }
-                catch (Exception err)
+                catch(Exception err)
                 {
                     MessageBox.Show(
                         "Falsches Passwort!",
@@ -153,20 +152,21 @@ namespace EncryptionWPF
             {
                 try
                 {
-                    SaveFileDialog saveFileDialog = new SaveFileDialog();
-                    saveFileDialog.Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*";
-                    saveFileDialog.FileName = "Text";
-                    saveFileDialog.DefaultExt = ".sfd";
-                    saveFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\UserData";
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
+                    {
+                        Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*",
+                        FileName = "Text",
+                        DefaultExt = ".sfd",
+                    };
                     if (saveFileDialog.ShowDialog() == true)
                     {
                         StreamWriter sw = new StreamWriter(saveFileDialog.FileName);
-                        sw.Write(textBoxOUT.Text + Environment.NewLine + "IV: " + assistant.GetIV() + Environment.NewLine + "Salt: " + assistant.GetSalt());
+                        sw.Write(textBoxOUT.Text + " :::/ " + assistant.GetIV() + " ::::: " + assistant.GetSalt());
                         sw.Close();
                         assistant.WriteLog("Datei gespeichert!");
                     }
                 }
-                catch (Exception err)
+                catch(Exception err)
                 {
                     MessageBox.Show(
                     "Konnte Datei nicht speichern!",
@@ -183,23 +183,24 @@ namespace EncryptionWPF
             try
             {
                 string content;
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*";
-                openFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\UserData";
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Filter = "SimpleEncryptionFile|*.sef|Alle Dateien|*.*",
+                };
                 if (openFileDialog.ShowDialog() == true)
                 {
                     content = File.ReadAllText(openFileDialog.FileName);
-                    textBoxIN.Text = content.Substring(0, content.LastIndexOf("IV: "));
-                    iv = content.Substring(content.LastIndexOf("IV: ") + 4, 16);
-                    assistant.SetSalt(content.Substring(content.LastIndexOf("Salt: ") + 6));
+                    textBoxIN.Text = content.Substring(0, content.LastIndexOf(":::/ "));
+                    iv = content.Substring(content.LastIndexOf(":::/ ") + 5, 16);
+                    assistant.SetSalt(content.Substring(content.LastIndexOf("::::: ") + 6));
                     assistant.WriteLog("Datei geladen!");
-                    if (CheckBoxAddIV.IsChecked == true)
+                    if(CheckBoxAddIV.IsChecked == true)
                     {
                         textBoxIN.Text += iv;
                     }
                 }
             }
-            catch (Exception err)
+            catch(Exception err)
             {
                 MessageBox.Show(
                     "Konnte Datei nicht lesen!",
@@ -212,9 +213,8 @@ namespace EncryptionWPF
 
         private void ButtonReset_Click(object sender, RoutedEventArgs e)
         {
-            textBoxPW.Text = "12345678";
+            textBoxPW.Text = assistant.RandomGen(12);
             iv = null;
-            logViewer = null;
             textBoxIN.Clear();
             textBoxOUT.Clear();
             assistant.ResetValues();
@@ -223,11 +223,6 @@ namespace EncryptionWPF
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
-            assistant.WriteLog("Programm geschlossen!");
-            if (CheckBoxDelLog.IsChecked == true)
-            {
-                assistant.DeleteLog();
-            }
             if (logViewer == null)
             {
                 this.Close();
@@ -242,13 +237,13 @@ namespace EncryptionWPF
         private void ButtonAbout_Click(object sender, RoutedEventArgs e)
         {
             assistant.WriteLog("Informationen über das Programm eingesehen");
-            MessageBox.Show(
-                "Erstellt von Tobias Nies." + Environment.NewLine
-                + "Dieses Programm nutzt die AES-256 Verschlüsselung." + Environment.NewLine
-                + "Version 1.2",
-                "SimpleEncryption",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                MessageBox.Show(
+                    "Erstellt von Tobias Nies." + Environment.NewLine
+                    + "Dieses Programm nutzt die AES-256 Verschlüsselung." + Environment.NewLine
+                    + "Version 1.2",
+                    "SimpleEncryption",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
         }
 
         private void ButtonGen_Click(object sender, RoutedEventArgs e)
@@ -265,7 +260,7 @@ namespace EncryptionWPF
                 logViewer = new LogViewer();
                 logViewer.Show();
             }
-            catch (Exception err)
+            catch(Exception err)
             {
                 assistant.WriteLog("Konnte LogViewer nicht öffnen! " + err.Message);
                 MessageBox.Show(
@@ -281,9 +276,11 @@ namespace EncryptionWPF
             try
             {
                 string content;
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Textdatei|*.txt|Alle Dateien|*.*";
-                openFileDialog.InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\";
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Filter = "Textdatei|*.txt|Alle Dateien|*.*",
+                    InitialDirectory = "C:\\Users\\" + Environment.UserName + "\\Documents\\"
+                };
                 if (openFileDialog.ShowDialog() == true)
                 {
                     content = File.ReadAllText(openFileDialog.FileName);
@@ -313,20 +310,20 @@ namespace EncryptionWPF
                 {
                     textBoxLastLog.Text = "Keine Log-Datei gefunden...";
                 }
-                await Task.Delay(TimeSpan.FromMilliseconds(200));
+                await Task.Delay(TimeSpan.FromMilliseconds(150));
             }
         }
 
         private void CheckBoxAddIV_Checked(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult boxResult = MessageBox.Show(
-                 "Diese Funktion sollte nur benutzt werden," +
-                 " wenn ein Text mehrfach verschlüsselt werden soll" +
-                 " und ist aktuell noch experimentell." + Environment.NewLine + "Trotzdem aktivieren?",
-                 "Achtung!",
-                 MessageBoxButton.YesNo,
-                 MessageBoxImage.Warning);
-            if (boxResult == MessageBoxResult.Yes)
+           MessageBoxResult boxResult = MessageBox.Show(
+                "Diese Funktion sollte nur benutzt werden," +
+                " wenn ein Text mehrfach verschlüsselt werden soll" +
+                " und ist aktuell noch experimentell." + Environment.NewLine + "Trotzdem aktivieren?",
+                "Achtung!",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if(boxResult == MessageBoxResult.Yes)
             {
                 CheckBoxAddIV.IsChecked = true;
             }
@@ -335,11 +332,11 @@ namespace EncryptionWPF
                 CheckBoxAddIV.IsChecked = false;
             }
         }
-        private async void IsUserOwner()
+        private async void AllowDebugAccess()
         {
             while (true)
             {
-                if (textBoxIN.Text == "Debug")
+                if (textBoxIN.Text == "DebugData")
                 {
                     ButtonLoadIVPW.IsEnabled = true;
                     ButtonLoadIVPW.Visibility = Visibility.Visible;
@@ -373,6 +370,58 @@ namespace EncryptionWPF
                 "Achtung!",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
+        }
+
+        private void SimpleEncryption_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(!(logViewer == null))
+            {
+                logViewer.Close();
+                assistant.WriteLog("LogViewer wurde durch SimpleEncryption geschlossen!");
+            }
+            assistant.WriteLog("Programm geschlossen!");
+
+            if (CheckBoxDelLog.IsChecked == true)
+            {
+                assistant.DeleteLog();
+            }
+        }
+        private async void bruteForce()
+        {
+            while (true)
+            {
+                if (CheckBoxBruteForce.IsChecked == true)
+                {
+                    string bfPassword = assistant.RandomGen(12);
+                    string bfIV = iv;
+                    textBoxPW.Text = bfPassword;
+                    assistant.SetPW(bfPassword);
+                    try
+                    {
+                        assistant.SetIV(iv);
+                        assistant.SetPW(textBoxPW.Text);
+                        aes.SetParams(assistant.GetPW(), assistant.GetIV());
+                        textBoxOUT.Text = aes.Decrypt(textBoxIN.Text);
+                        assistant.WriteLog("BruteForce: Passwort erraten!");
+                        assistant.WriteLog("BruteForce: Passwort: " + bfPassword + " IV: " + bfIV + " Salt: " + assistant.GetSalt());
+                        break;
+                    }
+                    catch (Exception err)
+                    {
+                        assistant.WriteLog("BruteForce: Passwort nicht erraten. " + err.Message);
+                    }
+                }
+                else
+                {
+                    //do nothing
+                }
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+            }
+        }
+
+        private void CheckBoxBruteForce_Checked(object sender, RoutedEventArgs e)
+        {
+            bruteForce();
         }
     }
 }

@@ -9,7 +9,8 @@
         Height="500" Width="600"
         x:Name="LogViewerWindow"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanMinimize">
+        ResizeMode="CanMinimize"
+        Closing="LogViewerWindow_Closing">
     <Grid Background="#FF323232">
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -106,5 +107,22 @@
             Foreground="White"
             Margin="15, 10"
             Checked="CheckLoadLog_Checked"/>
+        <Button
+            Grid.Column="4"
+            Grid.Row="3"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            MinHeight="25"
+            MinWidth="100"
+            Margin="10,10,0,0" 
+            Click="Button_Click">
+            <TextBlock
+                TextWrapping="Wrap"
+                TextAlignment="Center">
+                    Logge
+                    <LineBreak/>
+                    Systeminfos
+            </TextBlock>
+        </Button>
     </Grid>
 </Window>
