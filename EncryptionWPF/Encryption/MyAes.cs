@@ -11,16 +11,17 @@ namespace EncryptionWPF.Encryption
     {
 
         #region Variablen
-        public string IV_Setup;
         AesCryptoServiceProvider crypto;
         #endregion
 
         public MyAes()
         {
-            crypto = new AesCryptoServiceProvider();
-            crypto.KeySize = 256;
-            crypto.Mode = CipherMode.CBC;
-            crypto.Padding = PaddingMode.PKCS7;
+            crypto = new AesCryptoServiceProvider
+            {
+                KeySize = 256,
+                Mode = CipherMode.CBC,
+                Padding = PaddingMode.PKCS7
+            };
         }
         public String Encrypt(String clear_text)
         {
@@ -36,27 +37,19 @@ namespace EncryptionWPF.Encryption
         {
             ICryptoTransform transform = crypto.CreateDecryptor();
             byte[] enc_bytes = Convert.FromBase64String(cipher_text);
-            byte[] decrypted_bytes = transform.TransformFinalBlock(enc_bytes, 0, enc_bytes.Length);
+            byte[] decrypted_bytes = transform.TransformFinalBlock(
+                enc_bytes,
+                0,
+                enc_bytes.Length);
             string str = Encoding.Default.GetString(decrypted_bytes);
             return str;
         }
-        public String Generator(String key)
+        public void SetParams(String key, String iv_str)
         {
             byte[] Key_bytes = Encoding.Default.GetBytes(key);
             crypto.Key = Key_bytes;
-            string IV_Str = GetIV();
-            byte[] IV = Encoding.Default.GetBytes(IV_Str);
+            byte[] IV = Encoding.Default.GetBytes(iv_str);
             crypto.IV = IV;
-            string str = key;
-            return str;
-        }
-        public void SetIVfromPW(string pw)
-        {
-            IV_Setup = pw;
-        }
-        public string GetIV()
-        {
-            return IV_Setup;
         }
     }
 }

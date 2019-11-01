@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Microsoft.Win32;
+using System.Windows.Threading;
+using System.Security.Cryptography;
 
 namespace EncryptionWPF.Tools
 {
@@ -12,13 +14,18 @@ namespace EncryptionWPF.Tools
     {
 
         #region Variablen
-        private string iv, password;
+        private string iv, password, salt;
+        private readonly string logPath = "C:\\Users\\" + Environment.UserName + "\\Documents\\SimpleEncryption\\Logs\\SimpleEncryption.log";
+        private readonly string userDataDir = "C:\\Users\\" + Environment.UserName + "\\Documents\\SimpleEncryption\\UserData";
+        private readonly string logDataDir = "C:\\Users\\" + Environment.UserName + "\\Documents\\SimpleEncryption\\Logs";
+        SHA256 sha256 = SHA256.Create();
+        Random rnd = new Random();
         #endregion
 
         public void SetIV(string input)
         {
             iv = input;
-            while (iv.Length < 16)
+            while(iv.Length < 16)
             {
                 iv += iv;
             }
@@ -33,12 +40,15 @@ namespace EncryptionWPF.Tools
         }
         public void SetPW(string text)
         {
-            password = text;
+            password = string.Empty;
             while (password.Length < 32)
             {
-                password += password;
+                byte[] pwbytes = Encoding.Default.GetBytes(text + GetSalt());
+                byte[] sha = sha256.ComputeHash(pwbytes);
+                string hash = Encoding.Default.GetString(sha);
+                password += hash;
             }
-            while (password.Length > 32)
+            while(password.Length > 32)
             {
                 password = password.Remove(32, 1);
             }
@@ -51,22 +61,22 @@ namespace EncryptionWPF.Tools
         {
             try
             {
-                StreamWriter sw = File.AppendText("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log");
-                sw.Write(DateTime.Now + " " + input + Environment.NewLine);
+                StreamWriter sw = File.AppendText(logPath);
+                sw.Write("[" + DateTime.Now + "] " + input + Environment.NewLine);
                 sw.Close();
             }
             catch
             {
-                //nothing
+                //do nothing
             }
         }
         public void DeleteLog()
         {
             try
             {
-                if (File.Exists("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log"))
+                if (File.Exists(logPath))
                 {
-                    File.Delete("C:\\Users\\" + Environment.UserName + "\\Documents\\SEData\\Logs\\SEF.log");
+                    File.Delete(logPath);
                 }
             }
             catch (Exception err)
@@ -76,7 +86,6 @@ namespace EncryptionWPF.Tools
         }
         public string RandomGen(int count)
         {
-            Random rnd = new Random();
             List<char> str = new List<char>();
             for (int i = 0; i < count; i++)
             {
@@ -84,6 +93,48 @@ namespace EncryptionWPF.Tools
                 str.Add(c);
             }
             return new string(str.ToArray());
+        }
+        public string GetLogPath()
+        {
+            return logPath;
+        }
+        public void ResetValues()
+        {
+            iv = null;
+            password = null;
+            salt = null;
+        }
+        public void CreateDirectories()
+        {
+            try
+            {
+                if (!Directory.Exists(logDataDir))
+                {
+                    Directory.CreateDirectory(logDataDir);
+                    WriteLog("Log Verzeichnis erstellt!");
+                }
+                if (!Directory.Exists(userDataDir))
+                {
+                    Directory.CreateDirectory(userDataDir);
+                    WriteLog("UserData Verzeichnis erstellt!");
+                }
+            }
+            catch
+            {
+                //Do nothing
+            }
+        }
+        public void CreateSalt()
+        {
+            salt = RandomGen(rnd.Next(300, 2500));
+        }
+        public string GetSalt()
+        {
+            return salt;
+        }
+        public void SetSalt(string text)
+        {
+            salt = text;
         }
     }
 }
