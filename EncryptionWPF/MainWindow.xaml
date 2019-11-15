@@ -10,7 +10,7 @@
         Height="500" Width="800"
         x:Name="SimpleEncryption"
         WindowStartupLocation="CenterScreen"
-        Closing="SimpleEncryption_Closing">
+        Closing="SimpleEncryption_Closing" Icon="SEF Logo.ico">
     <Grid Background="#FF323232">
         <Grid.RowDefinitions>
             <RowDefinition/>
