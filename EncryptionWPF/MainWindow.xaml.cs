@@ -40,6 +40,7 @@ namespace EncryptionWPF
             UpdateLogText();
             AllowDebugAccess();
             textBoxPW.Password = assistant.RandomGen(12);
+            ShowPWClearText();
         }
 
         private void ButtonEncrypt_Click(object sender, RoutedEventArgs e)
@@ -424,12 +425,24 @@ namespace EncryptionWPF
             bruteForce();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void ShowPWClearText()
         {
-            MessageBox.Show("Ihr Passwort: " + textBoxPW.Password,
-                            "Passwort",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+            while (true)
+            {
+                if (CheckBoxShowPW.IsChecked == true)
+                {
+                    textBoxClearPW.Visibility = Visibility.Visible;
+                    textBoxClearPW.Text = textBoxPW.Password;
+                    textBoxClearPW.IsReadOnly = true;
+                }
+                else
+                {
+                    textBoxClearPW.Visibility = Visibility.Hidden;
+                    textBoxClearPW.Text = "";
+                    textBoxClearPW.IsReadOnly = true;
+                }
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+            }
         }
     }
 }

@@ -47,6 +47,19 @@
             Margin="10,25,0,0"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"/>
+        <TextBox
+            TabIndex="15"
+            Grid.ColumnSpan="2"
+            x:Name="textBoxClearPW"
+            MaxLength="32"
+            Visibility="Hidden"
+            Text=""
+            IsHitTestVisible="False"
+            MinWidth="230"
+            MinHeight="25"
+            Margin="10,25,0,0"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"/>
         <Button
             TabIndex="2"
             x:Name="buttonGen"
@@ -60,15 +73,15 @@
             Margin="250,25,0,0"
             Content="Generieren"
             Click="ButtonGen_Click"/>
-        <Button
+        <CheckBox
+            x:Name="CheckBoxShowPW"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"
             Grid.Column="2"
             Grid.Row="0"
+            Foreground="White"
             Content="Zeige Passwort"
-            MinHeight="25"
-            MinWidth="100"
-            Margin="40,25,0,0" Click="Button_Click"
+            Margin="40,30,0,0"
             />
         <Button
             x:Name="ButtonLoadIVPW"
