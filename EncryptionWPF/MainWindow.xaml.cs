@@ -39,13 +39,13 @@ namespace EncryptionWPF
             assistant.WriteLog("Programm gestartet!");
             UpdateLogText();
             AllowDebugAccess();
-            textBoxPW.Text = assistant.RandomGen(12);
+            textBoxPW.Password = assistant.RandomGen(12);
         }
 
         private void ButtonEncrypt_Click(object sender, RoutedEventArgs e)
         {
             iv = null;
-            if (string.IsNullOrWhiteSpace(textBoxPW.Text))
+            if (string.IsNullOrWhiteSpace(textBoxPW.Password))
             {
                 MessageBox.Show(
                     "Passwort darf nicht leer sein!",
@@ -74,7 +74,7 @@ namespace EncryptionWPF
                     }
                     assistant.CreateSalt();
                     assistant.SetIV(iv);
-                    assistant.SetPW(textBoxPW.Text);
+                    assistant.SetPW(textBoxPW.Password);
                     aes.SetParams(assistant.GetPW(), assistant.GetIV());
                     textBoxOUT.Text = aes.Encrypt(textBoxIN.Text);
                     if(CheckBoxAddIV.IsChecked == true)
@@ -97,7 +97,7 @@ namespace EncryptionWPF
 
         private void ButtonDecrypt_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(textBoxPW.Text))
+            if (string.IsNullOrWhiteSpace(textBoxPW.Password))
             {
                 MessageBox.Show(
                     "Passwort darf nicht leer sein!",
@@ -120,7 +120,7 @@ namespace EncryptionWPF
                 try
                 {
                     assistant.SetIV(iv);
-                    assistant.SetPW(textBoxPW.Text);
+                    assistant.SetPW(textBoxPW.Password);
                     aes.SetParams(assistant.GetPW(), assistant.GetIV());
                     textBoxOUT.Text = aes.Decrypt(textBoxIN.Text);
                     assistant.WriteLog("Text entschlüsselt!");
@@ -213,7 +213,7 @@ namespace EncryptionWPF
 
         private void ButtonReset_Click(object sender, RoutedEventArgs e)
         {
-            textBoxPW.Text = assistant.RandomGen(12);
+            textBoxPW.Password = assistant.RandomGen(12);
             iv = null;
             textBoxIN.Clear();
             textBoxOUT.Clear();
@@ -248,7 +248,7 @@ namespace EncryptionWPF
 
         private void ButtonGen_Click(object sender, RoutedEventArgs e)
         {
-            textBoxPW.Text = assistant.RandomGen(12);
+            textBoxPW.Password = assistant.RandomGen(12);
             assistant.WriteLog("Passwort generiert!");
         }
 
@@ -394,12 +394,12 @@ namespace EncryptionWPF
                 {
                     string bfPassword = assistant.RandomGen(12);
                     string bfIV = iv;
-                    textBoxPW.Text = bfPassword;
+                    textBoxPW.Password = bfPassword;
                     assistant.SetPW(bfPassword);
                     try
                     {
                         assistant.SetIV(iv);
-                        assistant.SetPW(textBoxPW.Text);
+                        assistant.SetPW(textBoxPW.Password);
                         aes.SetParams(assistant.GetPW(), assistant.GetIV());
                         textBoxOUT.Text = aes.Decrypt(textBoxIN.Text);
                         assistant.WriteLog("BruteForce: Passwort erraten!");
@@ -422,6 +422,14 @@ namespace EncryptionWPF
         private void CheckBoxBruteForce_Checked(object sender, RoutedEventArgs e)
         {
             bruteForce();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Ihr Passwort: " + textBoxPW.Password,
+                            "Passwort",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
     }
 }
