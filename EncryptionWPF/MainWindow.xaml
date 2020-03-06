@@ -159,11 +159,10 @@
             x:Name="buttonDecrypt"
             Grid.Column="4"
             Grid.Row="2"
-            VerticalAlignment="Top"
             HorizontalAlignment="Left"
             MinHeight="25"
             MinWidth="100"
-            Margin="10,45,0,0"
+            Margin="9.6,45.2,0,8.2"
             Content="Entschlüsseln"
             Click="ButtonDecrypt_Click"/>
         <CheckBox
@@ -289,7 +288,7 @@
             MinWidth="250"
             MinHeight="25"
             IsReadOnly="True"
-            Margin="160,25,0,0"/>
+            Margin="160,25,0,0" ClipToBounds="True"/>
         <Label
             x:Name="labelVersion"
             Foreground="White"
